@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Type Calculator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #F5F5F5;
+            font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+        }
+
+        .kontener {
+            margin: 10px;
+            padding: 15px;
+        }
+
+        hr {
+            border: 0;
+            border-bottom: 1px solid #DDD;
+            margin: 30px 0;
+        }
+
+        .osoba-1,
+        .osoba-2 {
+            display: flex;
+        }
+
+        .form {
+            display: flex;
+            flex-direction: column;
+            margin: 0 30px 0 0;
+        }
+
+        .form label {
+            margin-bottom: 10px;
+        }
+        
+        select {
+            border: none;
+            padding: 5px 5px 5px 0;
+            background-color: #0000;
+            font-size: 1.4em;
+            border-bottom: 1px solid #000;
+        }
+
+        h2 {
+            color: #FFF;
+            background: #8a0303;
+            margin-top: 0;
+            padding: 15px;
+        }
+
+        h3 {
+            font-size: 1.6em;
+            margin: 0 0 25px 0;
+        }
+
+        .przycisk {
+            padding: 15px;
+            margin: 30px 0;
+        }
+
+        .rezultat {
+            background-color: #FFF;
+            width: 170px;
+            height: 60px;
+            padding: 15px;
+        }
+
+        .rezultat-grupa {
+            font-weight: normal;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 5px;
+            text-align: center;
+        }
+    </style>
+    <script>
+        window.addEventListener("DOMContentLoaded", () => {
+            const kalkulator = document.querySelector('.kalkulator-grup-krwi');
+
+            const GRUPA_KRWI = {
+                '0': 0,
+                'a': 1,
+                'b': 2,
+                'ab': 3
+            };
+
+            const KREWNY = [
+                'Matka',
+                'Ojciec',
+                'Syn'
+            ];
+
+            // Get two relative selection fields
+            const pola = kalkulator.querySelectorAll('.krewny');
+            pola.forEach((el, idx, arr)=> {
+                el.addEventListener('change', (e) => {
+                    // Get the opposite selection field
+                    let select = arr[idx ^ 1];
+
+                    // Reset styles of field's values
+                    for(let i = 0; i < select.children.length; i++)
+                    {
+                        select.children[i].style.display = "block";
+                    };
+
+                    // Hide already selected (in other field) person
+                    if(e.currentTarget.value != "") {
+                        select.querySelector(`[value="${e.currentTarget.value}"]`).style.display = "none";
+                    }
+                });
+            });
+
+            kalkulator.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                let osoba1 = {
+                    "krewny": e.currentTarget.querySelector('.osoba-1 .krewny').value,
+                    "grupa_krwi": e.currentTarget.querySelector('.osoba-1 .grupa-krwi').value
+                }
+
+                let osoba2 = {
+                    "krewny": e.currentTarget.querySelector('.osoba-2 .krewny').value,
+                    "grupa_krwi": e.currentTarget.querySelector('.osoba-2 .grupa-krwi').value
+                }
+
+                if(osoba1["krewny"] != "-" && osoba2["krewny"] != "-") {
+                    let krew = [osoba1.grupa_krwi, osoba2.grupa_krwi];
+                    
+                    // Pick pre-generated matrix for parents or son
+                    let matrix = [];
+                    if(osoba1.krewny != "syn" && osoba2.krewny != "syn") {
+                        matrix = [
+                            ['0'      , '0 lub A'       , '0 lub B'       , 'A lub B'    ],
+                            ['0 lub A', '0 lub A'       , '0, A, B lub AB', 'A, B lub AB'],
+                            ['0 lub B', '0, A, B lub AB', '0 lub B'       , 'A, B lub AB'],
+                            ['A lub B', 'A, B lub AB'   , 'A, B lub AB'   , 'A, B lub AB'],
+                        ];
+                    } else {
+                        matrix = [
+                            ['0, A lub B', 'A lub AB'      , 'B lub AB'      , '-'          ],
+                            ['0, A lub B', '0, A, B lub AB', 'B lub AB'      , 'B lub AB'   ],
+                            ['0, A lub B', 'A lub AB'      , '0, A, B lub AB', 'A lub AB'   ],
+                            ['-'         , '0, A, B lub AB', '0, A, B lub AB', 'A, B lub AB'],
+                        ];
+                    }
+
+
+                    // Pick value from the matrix basing on blood types of relatives and their corresponding indexes (from "Enum")
+                    let rezultat = "";
+                    rezultat = matrix[ GRUPA_KRWI[krew[0]] ][ GRUPA_KRWI[krew[1]] ];
+
+                    // Pick result person to display (binary numbers principles)
+                    let osoba = "";
+                    osoba = KREWNY[ ~(KREWNY.indexOf(osoba1['krewny']) | KREWNY.indexOf(osoba2['krewny'])) & 3 ];
+
+                    document.querySelector(".rezultat").innerHTML = osoba + "<br>" + "<span class='rezultat-grupa'>" + rezultat + "</span>";
+                }
+            });
+        });
+    </script>
+    <noscript>Your browser does not support JavaScript!</noscript>
+</head>
+<body>
+    <div class="kontener">
+        <h2>Kalkulator grupy krwi - <small>Dominik Jałowiecki</small></h2>
+        <form class="kalkulator-grup-krwi">
+            <h3>Osoba 1</h3>
+            <div class="osoba-1">
+                <div class="form">
+                    <label for="krewny">Krewny</label>
+                    <select class="krewny" id="krewny">
+                        <option>-</option>
+                        <option value="Matka">Matka</option>
+                        <option value="Ojciec">Ojciec</option>
+                        <option value="Syn">Syn</option>
+                    </select>
+                </div>
+                <div class="form">
+                    <label for="grupa-krwi">Grupa krwi</label>
+                    <select class="grupa-krwi" id="grupa-krwi">
+                        <option value="0">0</option>
+                        <option value="a">A</option>
+                        <option value="b">B</option>
+                        <option value="ab">AB</option>
+                    </select>
+                </div>
+            </div>
+            <hr>
+            <h3>Osoba 2</h3>
+            <div class="osoba-2">
+                <div class="form">
+                    <label for="krewny">Krewny</label>
+                    <select class="krewny" id="krewny">
+                        <option>-</option>
+                        <option value="Matka">Matka</option>
+                        <option value="Ojciec">Ojciec</option>
+                        <option value="Syn">Syn</option>
+                    </select>
+                </div>
+                <div class="form">
+                    <label for="grupa-krwi">Grupa krwi</label>
+                    <select class="grupa-krwi" id="grupa-krwi">
+                        <option value="0">0</option>
+                        <option value="a">A</option>
+                        <option value="b">B</option>
+                        <option value="ab">AB</option>
+                    </select>
+                </div>
+            </div>
+            <p>
+                <input type="submit" class="przycisk" value="Sprawdź">
+            </p>
+        </form>
+        <h3 class="rezultat">
+            <span style="opacity: 0.5;">Rezultat</span>
+        </h3>
+        <table>
+            <tr>
+                <th>Grupa krwi (fenotyp)</th>
+                <th>Genotyp</th>
+            </tr>
+            <tr>
+                <td>A</td>
+                <td>I<sup>A</sup>I<sup>A</sup> lub I<sup>A</sup>i<sup>0</sup></td>
+            </tr>
+            <tr>
+                <td>B</td>
+                <td>I<sup>B</sup>I<sup>B</sup> lub I<sup>B</sup>i<sup>0</sup></td>
+            </tr>
+            <tr>
+                <td>AB</td>
+                <td>I<sup>A</sup>I<sup>B</sup></td>
+            </tr>
+            <tr>
+                <td>0</td>
+                <td>I<sup>0</sup>I<sup>0</sup></td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

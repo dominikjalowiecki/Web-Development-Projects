@@ -1,0 +1,17 @@
+.sekcja {
+    height: 750px;
+    width: 100%;
+    background-image: linear-gradient(rgba(81,87,115,0.85), rgba(43, 46, 52, 0.85));
+}
+
+.sekcja::before {
+    background: url('zdjecia/kobieta-1.jpg');
+    background-attachment: fixed;
+    background-size: cover;
+    content: "";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 750px;
+    z-index: -1;
+}

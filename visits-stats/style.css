@@ -1,0 +1,66 @@
+body {
+    font-family: sans-serif;
+    background-color: #373839;
+    color: #c9c7c5;
+}
+
+.chart {
+    width: 750px;
+}
+
+.chart .title {
+    text-align: center;
+    margin-left: 100px;
+    margin-bottom: 10px;
+    width: 100%;
+    font-weight: 700;
+    font-size: 1.4em;
+}
+
+.chart .text {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 40px;
+    width: 100px;
+    position: absolute;
+    left: 0;
+}
+
+.chart .percentage {
+    font-size: .8em;
+    width: 100%;
+    height: 40px;
+    margin-left: 100px;
+    background: repeating-linear-gradient(
+        to right,
+        #555,
+        #555 1px,
+        #fff0 1px,
+        #fff0 5%
+    );
+}
+
+.chart .percentage:after {
+    content: "";
+    display: block;
+    background-color: #007c7d;
+    color: #fff;
+    padding: 10px 0;
+    box-sizing: border-box;
+    height: 90%;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    animation: anim1 1s ease;
+}
+
+@keyframes anim1 {
+    0% {
+        width: 0%;
+    }
+
+    50% {
+        width: 0%;
+    }
+}
